@@ -2,21 +2,22 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
-import Users from "../models/users.js";
-import Notes from "../models/notes.js";
+import Users from "./users.js";
+import Notes from "./notes.js";
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Connect to MongoDB
-mongoose
-  .connect(
+// ✅ Connect to MongoDB directly with your URI
+if (!global.mongoose) {
+  global.mongoose = mongoose.connect(
     "mongodb+srv://abdulrehman:awes@cluster0.ojozblg.mongodb.net/notepad",
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+    .then(() => console.log("✅ Connected to MongoDB"))
+    .catch((err) => console.error("❌ MongoDB connection error:", err));
+}
 
 // ------------------- APIs -------------------
 
@@ -65,6 +66,4 @@ app.get("/notes/:userId", async (req, res) => {
 });
 
 // ✅ Export Express app as Vercel handler
-export default function handler(req, res) {
-  return app(req, res);
-}
+export default app;
