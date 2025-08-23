@@ -1,37 +1,55 @@
 import express from "express";
-
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import cors from "cors";
+import Users from "./models/users.js";
+import Notes from "./models/notes.js";
 const app = express();
-app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
+// ✅ Connect to MongoDB (new clean DB notepad_db)
+mongoose.connect(
+  "mongodb+srv://abdulrehman:awes@cluster0.ojozblg.mongodb.net/notepad",
+  { useNewUrlParser: true, useUnifiedTopology: true }
+).then(() => console.log("✅ Connected to MongoDB"))
+ .catch(err => console.error("❌ MongoDB connection error:", err));
+// ------------------- APIs -------------------
+// Register User
+app.post("/users", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
 
-// Root route
-app.get("/", (req, res) => {
-  res.send("API is live! Use POST /login endpoint.");
-});
-
-// Login route
-app.post("/login", (req, res) => {
-  const { email, name, pass } = req.body;
-  if (!email || !name || !pass) {
-    return res.status(400).send({
-      success: false,
-      message: "Please fill all fields (email, name, password).",
-    });
+    const exists = await Users.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+    const user = await Users.create({ username, email, password });
+    res.json({ message: "User created", user });
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong" });
   }
-  if (!email.includes("@gmail.com")) {
-    return res.status(400).send({
-      success: false,
-      message: "Email must be a valid Gmail address (e.g. example@gmail.com).",
-    });
+});
+// Create Note
+app.post("/notes", async (req, res) => {
+  try {
+    const { userId, title, content } = req.body;
+
+    const note = await Notes.create({ userId, title, content });
+    res.json({ message: "Note created", note });
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong" });
   }
-  res.send({
-    success: true,
-    message: "Login successful",
-    data: { email, name, pass },
-  });
 });
 
-// Use dynamic port for Vercel
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Get Notes by User
+app.get("/notes/:userId", async (req, res) => {
+  try {
+    const notes = await Notes.find({ userId: req.params.userId });
+    res.json(notes);
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
 });
+// ---------------------------------------------
+const PORT = 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
