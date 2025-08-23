@@ -2,8 +2,8 @@ import express from "express";
 import mongoose from "mongoose"; 
 import bodyParser from "body-parser"; 
 import cors from "cors"; 
-import Users from "./models/users.js"; 
-import Notes from "./models/notes.js"; 
+import Users from "../models/users.js"; 
+import Notes from "../models/notes.js"; 
 
 const app = express(); 
 app.use(cors()); 
