@@ -1,9 +1,21 @@
+
 {
+  "_comment_version": "Vercel config version",
   "version": 2,
+  
+  "_comment_builds": "Defines the builds for serverless functions",
   "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" }
+    { 
+      "src": "api/index.js", 
+      "use": "@vercel/node" 
+    }
   ],
+
+  "_comment_routes": "Routes map incoming requests to serverless functions",
   "routes": [
-    { "src": "/(.*)", "dest": "api/index.js" }
+    { 
+      "src": "/(.*)", 
+      "dest": "api/index.js" 
+    }
   ]
 }
