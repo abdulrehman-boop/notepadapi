@@ -1,15 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import cors from "cors";
+import cors from "cors";   
 import Users from "./users.js";
 import Notes from "./notes.js";
-
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
-
-// ✅ Connect to MongoDB directly with your URI
+app.use(cors());
 if (!global.mongoose) {
   global.mongoose = mongoose.connect(
     "mongodb+srv://abdulrehman:awes@cluster0.ojozblg.mongodb.net/notepad",
@@ -18,15 +15,10 @@ if (!global.mongoose) {
     .then(() => console.log("✅ Connected to MongoDB"))
     .catch((err) => console.error("❌ MongoDB connection error:", err));
 }
-
-// ------------------- APIs -------------------
-
-// Root route
 app.get("/", (req, res) => {
   res.send("🚀 Notepad API is running on Vercel");
 });
 
-// Register User
 app.post("/users", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -41,8 +33,6 @@ app.post("/users", async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
-
-// Create Note
 app.post("/notes", async (req, res) => {
   try {
     const { userId, title, content } = req.body;
@@ -53,8 +43,6 @@ app.post("/notes", async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
-
-// Get Notes by User
 app.get("/notes/:userId", async (req, res) => {
   try {
     const notes = await Notes.find({ userId: req.params.userId });
@@ -64,6 +52,4 @@ app.get("/notes/:userId", async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
-
-// ✅ Export Express app as Vercel handler
 export default app;
